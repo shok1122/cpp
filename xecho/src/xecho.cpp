@@ -10,6 +10,7 @@ static u8 opt_duplication_size = 1; // default: 1 byte
 static char* opt_stdin_data = nullptr;
 static u32 opt_stdin_data_len;
 static enum MODE { eDUPLICATE, eCOUNTUP } opt_mode = eDUPLICATE;
+static long opt_increasing_rate = 1;
 
 static void getargs(int argc, char** argv)
 {
@@ -30,8 +31,12 @@ static void getargs(int argc, char** argv)
 				{
 					opt_mode = eDUPLICATE;
 				}
-				else if (0 == strcmp("countup", optarg))
+				else if (strcmp("countup", optarg) <= 0)
 				{
+					char* c = strtok(optarg, "-");
+					if (0 != strcmp("countup", c)) break;
+					if (NULL == (c = strtok(NULL, "-"))) break;
+					opt_increasing_rate = atol(c);
 					opt_mode = eCOUNTUP;
 				}
 				else
@@ -122,7 +127,7 @@ int main(int argc, char** argv)
 		{
 			for (u32 j = 0; j < data_len; j++)
 			{
-				if (0 < i) stdout_data[j]++;
+				if (0 < i) stdout_data[j] += opt_increasing_rate;
 			}
 		}
 		fwrite(stdout_data, 1, data_len, stdout);
