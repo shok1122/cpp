@@ -12,13 +12,47 @@ static u32 opt_stdin_data_len;
 static enum MODE { eDUPLICATE, eCOUNTUP, eCOUNTDOWN } opt_mode = eDUPLICATE;
 static long opt_amount = 1;
 
-static void getargs(int argc, char** argv)
+static void help()
+{
+	fputs(
+			"usage: %s [OPTION...] [HEX_STRING]\n"
+			"指定されたバイナリデータからオプションに応じて生成したバイナリデータを標準出力に出力します．\n"
+			"\n"
+			"    -l NUM    入力データをNUM倍にする．\n"
+			"    -m MODE   NUM倍時にMODEに応じた演算を加える（MUST: -l）\n"
+			"              MODE: countup-NUM, countdown-NUM それぞれNUM分インクリメント，デクリメントを行う．\n"
+			"              NUMを省略した場合，1が入力されたとして扱われる．\n"
+			"    -h        ヘルプを表示．\n"
+			"\n"
+			"[HEX_STRING]の指定が無い場合，標準入力からの入力を受け付ける．\n"
+			"\n"
+			"使用例：\n"
+			"    xecho -l 8 -m countup 0000 | xecho -l 2 | xecho -l 4 -m countup-16 > out.dat\n"
+			"    [out.dat]\n"
+			"    0000000 : 0000 0101 0202 0303 0404 0505 0606 0707\n"
+			"    0000010 : 0000 0101 0202 0303 0404 0505 0606 0707\n"
+			"    0000020 : 1010 1111 1212 1313 1414 1515 1616 1717\n"
+			"    0000030 : 1010 1111 1212 1313 1414 1515 1616 1717\n"
+			"    0000040 : 2020 2121 2222 2323 2424 2525 2626 2727\n"
+			"    0000050 : 2020 2121 2222 2323 2424 2525 2626 2727\n"
+			"    0000060 : 3030 3131 3232 3333 3434 3535 3636 3737\n"
+			"    0000070 : 3030 3131 3232 3333 3434 3535 3636 3737\n"
+			"    0000080 : \n"
+			"\n", stderr);
+}
+
+static bool getargs(int argc, char** argv)
 {
 	int opt;
-	while (-1 != (opt = getopt(argc, argv, "l:m:")))
+	while (-1 != (opt = getopt(argc, argv, "hl:m:")))
 	{
 		switch (opt)
 		{
+			case 'h':
+			{
+				help();
+				return false;
+			}
 			case 'l':
 			{
 				u32 l = atol(optarg);
@@ -74,6 +108,8 @@ static void getargs(int argc, char** argv)
 		}
 		c++;
 	}
+
+	return true;
 }
 
 bool get_input(u8** stdout_data, u32* stdin_data_len)
@@ -127,7 +163,7 @@ bool get_input(u8** stdout_data, u32* stdin_data_len)
 int main(int argc, char** argv)
 {
 	prepare_main(argc, argv);
-	getargs(argc, argv);
+	if (false == getargs(argc, argv)) return 1;
 
 	u8* stdout_data;
 	u32 data_len = 0;
