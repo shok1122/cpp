@@ -80,13 +80,24 @@ bool get_input(u8** stdout_data, u32* stdin_data_len)
 {
 	if (NULL == opt_stdin_data)
 	{
-		*stdout_data = (u8*) malloc(32);
+		static const u32 memory_block_size = 8;
+		u32 memory_block_num = 1;
+		*stdout_data = (u8*) malloc(memory_block_size);
 		u8* stdin_buffer = *stdout_data;
 		while (true)
 		{
-			char tmp[4];
-			memset(tmp, 0, sizeof(tmp));
-			u32 c = fread(stdin_buffer, 1, 4, stdin);
+			u32 memory_size = memory_block_size * memory_block_num;
+			if (memory_size <= *stdin_data_len)
+			{
+				memory_size = memory_block_size * (++memory_block_num);
+				*stdout_data = (u8*) realloc(
+						*stdout_data,
+						memory_size);
+			}
+			u32 c = fread(
+					&(stdin_buffer[*stdin_data_len]),
+					1, memory_size - *stdin_data_len,
+					stdin);
 			if (0 == c)
 			{
 				break;
