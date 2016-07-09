@@ -9,11 +9,12 @@
 static u8 opt_duplication_size = 1; // default: 1 byte
 static char* opt_stdin_data = nullptr;
 static u32 opt_stdin_data_len;
+static enum MODE { eDUPLICATE, eCOUNTUP } opt_mode = eDUPLICATE;
 
 static void getargs(int argc, char** argv)
 {
 	int opt;
-	while (-1 != (opt = getopt(argc, argv, "l:")))
+	while (-1 != (opt = getopt(argc, argv, "l:m:")))
 	{
 		switch (opt)
 		{
@@ -21,6 +22,22 @@ static void getargs(int argc, char** argv)
 			{
 				u32 l = atol(optarg);
 				opt_duplication_size = (0xFF < l) ? 0xFF : l;
+				break;
+			}
+			case 'm':
+			{
+				if (0 == strcmp("duplicate", optarg))
+				{
+					opt_mode = eDUPLICATE;
+				}
+				else if (0 == strcmp("countup", optarg))
+				{
+					opt_mode = eCOUNTUP;
+				}
+				else
+				{
+					opt_mode = eDUPLICATE;
+				}
 				break;
 			}
 			default:
@@ -97,6 +114,17 @@ int main(int argc, char** argv)
 
 	for(u8 i = 0; i < opt_duplication_size; i++)
 	{
+		if (eDUPLICATE == opt_mode)
+		{
+			// do nothing
+		}
+		else if (eCOUNTUP == opt_mode)
+		{
+			for (u32 j = 0; j < data_len; j++)
+			{
+				if (0 < i) stdout_data[j]++;
+			}
+		}
 		fwrite(stdout_data, 1, data_len, stdout);
 	}
 
