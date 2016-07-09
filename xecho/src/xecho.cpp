@@ -46,18 +46,41 @@ static void getargs(int argc, char** argv)
 	}
 }
 
-void get_input(u8** stdout_data, u32* data_len)
+bool get_input(u8** stdout_data, u32* stdin_data_len)
 {
-	if (NULL != opt_stdin_data)
+	if (NULL == opt_stdin_data)
 	{
-		*data_len = opt_stdin_data_len / 2;
-		*stdout_data = (u8*) malloc(*data_len);
+		*stdout_data = (u8*) malloc(32);
+		u8* stdin_buffer = *stdout_data;
+		while (true)
+		{
+			char tmp[4];
+			memset(tmp, 0, sizeof(tmp));
+			u32 c = fread(stdin_buffer, 1, 4, stdin);
+			if (0 == c)
+			{
+				break;
+			}
+			*stdin_data_len += c;
+		}
+		if (0 == feof(stdin))
+		{
+			LOGOUT("error: fread(stdin)");
+			return false;
+		}
+	}
+	else
+	{
+		*stdin_data_len = opt_stdin_data_len / 2;
+		*stdout_data = (u8*) malloc(*stdin_data_len);
 		u8 hex_strings_len = strlen(opt_stdin_data);
 		for (u8 i = 0; i < hex_strings_len; i+=2)
 		{
 			sscanf(&(opt_stdin_data[i]), "%02X", (unsigned int*) &((*stdout_data)[i/2]));
 		}
 	}
+
+	return true;
 }
 
 int main(int argc, char** argv)
@@ -67,14 +90,16 @@ int main(int argc, char** argv)
 
 	u8* stdout_data;
 	u32 data_len = 0;
-	get_input(&stdout_data, &data_len);
+	if (false == get_input(&stdout_data, &data_len))
+	{
+		return 10;
+	}
 
 	for(u8 i = 0; i < opt_duplication_size; i++)
 	{
 		fwrite(stdout_data, 1, data_len, stdout);
 	}
 
-	fflush(stdout);
 	free(stdout_data);
 
 	return 0;
