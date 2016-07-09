@@ -35,16 +35,16 @@ static void getargs(int argc, char** argv)
 				{
 					char* mode = strtok(optarg, "-");
 					char* amount = strtok(NULL, "-");
-					if (NULL == mode || NULL == amount) break;
+					if (NULL == mode) break;
 					if (0 == strcmp("countup", mode))
 					{
 						opt_mode = eCOUNTUP;
-						opt_amount = atol(amount);
+						opt_amount = (NULL == amount) ? 1 : atol(amount);
 					}
 					else if (0 == strcmp("countdown", mode))
 					{
 						opt_mode = eCOUNTDOWN;
-						opt_amount = atol(amount) * (-1);
+						opt_amount = (NULL == amount) ? (-1) : (-1) * atol(amount);
 					}
 				}
 				else
