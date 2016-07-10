@@ -11,6 +11,7 @@ static char* opt_stdin_data = nullptr;
 static u32 opt_stdin_data_len;
 static enum MODE { eDUPLICATE, eCOUNTUP, eCOUNTDOWN } opt_mode = eDUPLICATE;
 static long opt_amount = 1;
+static FILE* opt_file = NULL;
 
 static void help()
 {
@@ -18,10 +19,11 @@ static void help()
 			"usage: %s [OPTION...] [HEX_STRING]\n"
 			"指定されたバイナリデータからオプションに応じて生成したバイナリデータを標準出力に出力します．\n"
 			"\n"
-			"    -l NUM    入力データをNUM倍にする．\n"
+			"    -l NUM    入力データのサイズをNUM倍にする．\n"
 			"    -m MODE   NUM倍時にMODEに応じた演算を加える（MUST: -l）\n"
 			"              MODE: countup-NUM, countdown-NUM それぞれNUM分インクリメント，デクリメントを行う．\n"
 			"              NUMを省略した場合，1が入力されたとして扱われる．\n"
+			"    -f FILE   入力データにファイルを指定．\n"
 			"    -h        ヘルプを表示．\n"
 			"\n"
 			"[HEX_STRING]の指定が無い場合，標準入力からの入力を受け付ける．\n"
@@ -44,7 +46,7 @@ static void help()
 static bool getargs(int argc, char** argv)
 {
 	int opt;
-	while (-1 != (opt = getopt(argc, argv, "hl:m:")))
+	while (-1 != (opt = getopt(argc, argv, "hl:m:f:")))
 	{
 		switch (opt)
 		{
@@ -87,6 +89,10 @@ static bool getargs(int argc, char** argv)
 				}
 				break;
 			}
+			case 'f':
+			{
+				opt_file = fopen(optarg, "rb");
+			}
 			default:
 			{
 				break;
@@ -120,6 +126,7 @@ bool get_input(u8** stdout_data, u32* stdin_data_len)
 		u32 memory_block_num = 1;
 		*stdout_data = (u8*) malloc(memory_block_size);
 		u8* stdin_buffer = *stdout_data;
+		FILE* fp = (NULL == opt_file) ? stdin : opt_file;
 		while (true)
 		{
 			u32 memory_size = memory_block_size * memory_block_num;
@@ -133,17 +140,22 @@ bool get_input(u8** stdout_data, u32* stdin_data_len)
 			u32 c = fread(
 					&(stdin_buffer[*stdin_data_len]),
 					1, memory_size - *stdin_data_len,
-					stdin);
+					fp);
 			if (0 == c)
 			{
 				break;
 			}
 			*stdin_data_len += c;
 		}
-		if (0 == feof(stdin))
+		if (0 == feof(fp))
 		{
 			LOGOUT("error: fread(stdin)");
 			return false;
+		}
+
+		if (stdin != fp)
+		{
+			fclose(fp);
 		}
 	}
 	else
