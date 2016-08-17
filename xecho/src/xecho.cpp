@@ -6,7 +6,7 @@
 #include <string.h>
 #include <getopt.h>
 
-static u8 opt_duplication_size = 1; // default: 1 byte
+static u32 opt_duplication_size = 1; // default: 1 byte
 static char* opt_stdin_data = nullptr;
 static u32 opt_stdin_data_len;
 static enum MODE { eDUPLICATE, eCOUNTUP, eCOUNTDOWN } opt_mode = eDUPLICATE;
@@ -58,7 +58,7 @@ static bool getargs(int argc, char** argv)
 			case 'l':
 			{
 				u32 l = atol(optarg);
-				opt_duplication_size = (0xFF < l) ? 0xFF : l;
+				opt_duplication_size = (0xffffffff < l) ? 0xffffffff : l;
 				break;
 			}
 			case 'm':
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
 		return 10;
 	}
 
-	for(u8 i = 0; i < opt_duplication_size; i++)
+	for(u32 i = 0; i < opt_duplication_size; i++)
 	{
 		if (eDUPLICATE == opt_mode)
 		{
