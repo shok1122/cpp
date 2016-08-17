@@ -122,7 +122,7 @@ bool get_input(u8** stdout_data, u32* stdin_data_len)
 {
 	if (NULL == opt_stdin_data)
 	{
-		static const u32 memory_block_size = 8;
+		static const u32 memory_block_size = 256;
 		u32 memory_block_num = 1;
 		*stdout_data = (u8*) malloc(memory_block_size);
 		u8* stdin_buffer = *stdout_data;
