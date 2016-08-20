@@ -2,8 +2,10 @@ CC := gcc
 
 CFLAGS :=
 CFLAGS += -Wall
-CFLAGS += -g
 CFLAGS += -std=c++11
+
+CFLAGS_DEBUG := -g3 -O0
+CFLAGS_RELEASE := -g0 -O2
 
 TARGET := xecho
 
@@ -19,7 +21,13 @@ SRCS := $(OBJS:.o=.cpp)
 
 vpath %.cpp $(DEVROOT)/$(TARGET)/src
 
-.PHONY: all clean distclean
+.PHONY: release debug all clean distclean
+
+release: CFLAGS += $(CFLAGS_RELEASE)
+release: all
+
+debug: CFLAGS += $(CFLAGS_DEBUG)
+debug: all
 
 all: $(TARGET)
 	@echo finish!!!
