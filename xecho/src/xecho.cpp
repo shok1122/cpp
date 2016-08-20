@@ -106,8 +106,20 @@ static bool getargs(int argc, char** argv)
 		switch (c)
 		{
 			case 0:
-				opt_stdin_data = argv[optind++];
-				opt_stdin_data_len = strlen(opt_stdin_data);
+				opt_stdin_data_len = strlen(argv[optind]);
+				if (0 != opt_stdin_data_len%2)
+				{
+					opt_stdin_data = (char*) malloc(opt_stdin_data_len + 1 + 1);
+					strcpy(opt_stdin_data, "0");
+					strcat(opt_stdin_data, argv[optind]);
+					opt_stdin_data_len++;
+				}
+				else
+				{
+					opt_stdin_data = (char*) malloc(opt_stdin_data_len + 1);
+					strcpy(opt_stdin_data, argv[optind]);
+				}
+				optind++;
 				break;
 			default:
 				break;
@@ -162,10 +174,17 @@ bool get_input(u8** stdout_data, u32* stdin_data_len)
 	{
 		*stdin_data_len = opt_stdin_data_len / 2;
 		*stdout_data = (u8*) malloc(*stdin_data_len);
-		u8 hex_strings_len = strlen(opt_stdin_data);
-		for (u8 i = 0; i < hex_strings_len; i+=2)
+
+		u32 index = 0;
+		for (u8 i = opt_stdin_data_len; 0 < i; i-=2)
 		{
-			sscanf(&(opt_stdin_data[i]), "%02X", (unsigned int*) &((*stdout_data)[i/2]));
+			char* endptr;
+
+			char pcharByteStr1[3] = {0};
+			memcpy(pcharByteStr1, &(opt_stdin_data[i-2]), 2);
+			long l = strtol(pcharByteStr1, &endptr, 16);
+
+			(*stdout_data)[index++] = l;
 		}
 	}
 
