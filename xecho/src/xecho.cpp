@@ -16,7 +16,7 @@ static FILE* opt_out_file = stdout;
 
 static void help()
 {
-	fputs(
+	fprintf(stderr,
 			"usage: %s [OPTION...] [HEX_STRING] [OUT_FILE]\n"
 			"指定されたバイナリデータからオプションに応じて生成したバイナリデータを標準出力に出力します．\n"
 			"\n"
@@ -47,7 +47,7 @@ static void help()
 			"    0000060 : 3030 3131 3232 3333 3434 3535 3636 3737\n"
 			"    0000070 : 3030 3131 3232 3333 3434 3535 3636 3737\n"
 			"    0000080 : \n"
-			"\n", stderr);
+			"\n", PROG_NAME);
 }
 
 static bool getargs(int argc, char** argv)
