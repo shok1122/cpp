@@ -12,6 +12,7 @@ static u32 opt_stdin_data_len;
 static enum MODE { eDUPLICATE, eCOUNTUP, eCOUNTDOWN } opt_mode = eDUPLICATE;
 static long opt_amount = 1;
 static FILE* opt_file = NULL;
+static FILE* opt_out_file = stdout;
 
 static void help()
 {
@@ -106,6 +107,7 @@ static bool getargs(int argc, char** argv)
 		switch (c)
 		{
 			case 0:
+			{
 				opt_stdin_data_len = strlen(argv[optind]);
 				if (0 != opt_stdin_data_len%2)
 				{
@@ -119,6 +121,21 @@ static bool getargs(int argc, char** argv)
 					opt_stdin_data = (char*) malloc(opt_stdin_data_len + 1);
 					strcpy(opt_stdin_data, argv[optind]);
 				}
+			}
+				optind++;
+				break;
+			case 1:
+			{
+				char* path_outfile = argv[optind];
+				if (0 == strcmp("-", path_outfile))
+				{
+					opt_out_file = stdout;
+				}
+				else
+				{
+					opt_out_file = fopen(path_outfile, "wb");
+				}
+			}
 				optind++;
 				break;
 			default:
@@ -216,9 +233,10 @@ int main(int argc, char** argv)
 				if (0 < i) stdout_data[j] += opt_amount;
 			}
 		}
-		fwrite(stdout_data, 1, data_len, stdout);
+		fwrite(stdout_data, 1, data_len, opt_out_file);
 	}
 
+	fclose(opt_out_file);
 	free(stdout_data);
 
 	return 0;
