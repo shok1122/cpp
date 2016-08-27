@@ -17,9 +17,10 @@ static FILE* opt_out_file = stdout;
 static void help()
 {
 	fputs(
-			"usage: %s [OPTION...] [HEX_STRING]\n"
+			"usage: %s [OPTION...] [HEX_STRING] [OUT_FILE]\n"
 			"指定されたバイナリデータからオプションに応じて生成したバイナリデータを標準出力に出力します．\n"
 			"\n"
+			"[OPTION...]\n"
 			"    -l NUM    入力データのサイズをNUM倍にする．\n"
 			"    -m MODE   NUM倍時にMODEに応じた演算を加える（MUST: -l）\n"
 			"              MODE: countup-NUM, countdown-NUM それぞれNUM分インクリメント，デクリメントを行う．\n"
@@ -27,7 +28,12 @@ static void help()
 			"    -f FILE   入力データにファイルを指定．\n"
 			"    -h        ヘルプを表示．\n"
 			"\n"
-			"[HEX_STRING]の指定が無い場合，標準入力からの入力を受け付ける．\n"
+			"[HEX_STRING]\n"
+			"    入力データ．16進数文字列で指定．\n"
+			"    指定が無い場合，標準入力から受け付ける．\n"
+			"\n"
+			"[OUT_FILE]\n"
+			"    出力ファイル名．\"-\"を指定すると標準出力に出力．\n"
 			"\n"
 			"使用例：\n"
 			"    xecho -l 8 -m countup 0000 | xecho -l 2 | xecho -l 4 -m countup-16 > out.dat\n"
