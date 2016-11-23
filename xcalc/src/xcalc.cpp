@@ -31,15 +31,16 @@ static void help()
 	fprintf(stderr,
 			"usage: %s [OPTION...] [FILE]\n"
 			"[OPTION]\n"
-			"    --mode <ARG>           計算モードを指定\n"
-			"                           ARG: add, sub, and, or\n"
-			"    --val  <ARG>           計算に使用する値\n"
-			"    --size <ARG>           計算単位サイズ\n"
-			"                           ARG: 1, 2, 4\n"
-			"    --area <ARG1> <ARG2>   入力データエリアARG1に対してARG2エリアを計算\n"
-			"                           ARG1: <WIDTH>x<HEIGHT>\n"
-			"                           ARG2: <WIDTH>x<HEIGHT> *start:0\n"
-			"    --help                 ヘルプを表示\n"
+			"    --mode <ARG>                  計算モードを指定\n"
+			"                                  ARG: add, sub, and, or\n"
+			"    --val  <ARG>                  計算に使用する値\n"
+			"    --size <ARG>                  計算単位サイズ\n"
+			"                                  ARG: 1, 2, 4\n"
+			"    --area <ARG1>/<ARG2>-<ARG3>   入力データエリアARG1に対して開始点ARG2からARG3サイズのエリアを計算\n"
+			"                                  ARG1: <WIDTH>x<HEIGHT>\n"
+			"                                  ARG2: <WIDTH>,<HEIGHT> *0以上\n"
+			"                                  ARG3: <WIDTH>,<HEIGHT> *0以上\n"
+			"    --help                        ヘルプを表示\n"
 			"    \n"
 			, PROG_NAME
 			);
@@ -117,18 +118,18 @@ static bool decode_longopts(int a_long_opt)
 			break;
 		case OPTTYPE_AREA:
 		{
-			char* token1 = strtok(optarg, ",");
-			char* token2 = strtok(NULL, ",");
-			char* token3 = strtok(NULL, ",");
+			char* token1 = strtok(optarg, "/");
+			char* token2 = strtok(NULL, "-");
+			char* token3 = strtok(NULL, "-");
 
 			opt_width_data = atoi(strtok(token1, "x"));
 			opt_height_data = atoi(strtok(NULL, "x"));
 
-			opt_width_start_calc = atoi(strtok(token2, "-"));
-			opt_height_start_calc = atoi(strtok(NULL, "-"));
+			opt_width_start_calc = atoi(strtok(token2, ","));
+			opt_height_start_calc = atoi(strtok(NULL, ","));
 
-			opt_width_end_calc = atoi(strtok(token3, "-"));
-			opt_height_end_calc = atoi(strtok(NULL, "-"));
+			opt_width_end_calc = atoi(strtok(token3, ","));
+			opt_height_end_calc = atoi(strtok(NULL, ","));
 		}
 			break;
 		default:
