@@ -15,10 +15,10 @@ static enum CalcMode
 	calc_and,
 	calc_or,
 } opt_calc_mode;
-
+static u32 opt_val = 0;
+static u8 opt_size = 1;
 static FILE* opt_in_file = NULL;
 static FILE* opt_out_file = stdout;
-static u32 opt_val = 0;
 
 static void help()
 {
@@ -28,6 +28,7 @@ static void help()
 			"    --mode    計算モードを指定\n"
 			"              add, sub, and, or\n"
 			"    --val     計算に使用する値\n"
+			"    --size    計算単位サイズ（1, 2, 4）\n"
 			"    --help    ヘルプを表示\n"
 			"    \n"
 			, PROG_NAME
@@ -65,6 +66,7 @@ enum OPTTYPE
 {
 	OPTTYPE_MODE = 1,
 	OPTTYPE_VAL,
+	OPTTYPE_SIZE,
 	OPTTYPE_HELP,
 };
 
@@ -72,11 +74,12 @@ struct option long_options[] =
 {
 	{ "mode", required_argument, &long_opt, OPTTYPE_MODE },
 	{ "val",  required_argument, &long_opt, OPTTYPE_VAL  },
+	{ "size", required_argument, &long_opt, OPTTYPE_SIZE },
 	{ "help", no_argument,       &long_opt, OPTTYPE_HELP },
 	{ 0, 0, 0, 0 }
 };
 
-static void decode_longopts(int a_long_opt)
+static bool decode_longopts(int a_long_opt)
 {
 	switch (a_long_opt)
 	{
@@ -91,12 +94,23 @@ static void decode_longopts(int a_long_opt)
 			opt_val = strtol(optarg, &endptr, 16);
 		}
 			break;
+		case OPTTYPE_SIZE:
+		{
+			opt_size = atoi(optarg);
+			if (1 != opt_size && 2 != opt_size && 4 != opt_size)
+			{
+				return false;
+			}
+		}
+			break;
 		default:
 		{
 			help();
 		}
 			break;
 	}
+
+	return true;
 }
 
 static bool getargs(int argc, char** argv)
@@ -108,7 +122,10 @@ static bool getargs(int argc, char** argv)
 		switch (opt)
 		{
 			case 0:
-				decode_longopts(long_opt);
+				if (false == decode_longopts(long_opt))
+				{
+					return false;
+				}
 				break;
 			case 'h':
 				help();
@@ -133,44 +150,92 @@ static bool check_opt()
 	return true;
 }
 
+static u32 decode(u8 size, u32 i, u8* a_pbuffer)
+{
+	u32 retval;
+	switch (size)
+	{
+		case 1:
+		{
+			u8* pTmp = (u8*) &(a_pbuffer[i]);
+			retval = *pTmp;
+		}
+			break;
+		case 2:
+		{
+			u16* pTmp = (u16*) &(a_pbuffer[i]);
+			retval = *pTmp;
+		}
+			break;
+		case 4:
+		{
+			u32* pTmp = (u32*) &(a_pbuffer[i]);
+			retval = *pTmp;
+		}
+			break;
+	}
+
+	return retval;
+}
+
+static void encode(u8 size, u32 data, u32 i, u8* a_pbuffer)
+{
+	switch (size)
+	{
+		case 1:
+		{
+			u8* pTmp = (u8*) &(a_pbuffer[i]);
+			*pTmp = data;
+		}
+			break;
+		case 2:
+		{
+			u16* pTmp = (u16*) &(a_pbuffer[i]);
+			*pTmp = data;
+		}
+			break;
+		case 4:
+		{
+			u32* pTmp = (u32*) &(a_pbuffer[i]);
+			*pTmp = data;
+		}
+			break;
+	}
+}
+
 static void calc(u32 a_size, u8* a_pbuffer)
 {
-	switch (opt_calc_mode)
+	for (u32 i = 0; i < a_size; i += opt_size)
 	{
-		case calc_add:
+		u32 data = decode(opt_size, i, a_pbuffer);
+
+		switch (opt_calc_mode)
 		{
-			for (u32 i = 0; i < a_size; i++)
+			case calc_add:
 			{
-				a_pbuffer[i] += opt_val;
+				data += opt_val;
 			}
-		}
-			break;
-		case calc_sub:
-		{
-			for (u32 i = 0; i < a_size; i++)
+				break;
+			case calc_sub:
 			{
-				a_pbuffer[i] -= opt_val;
+				data -= opt_val;
 			}
-		}
-			break;
-		case calc_and:
-		{
-			for (u32 i = 0; i < a_size; i++)
+				break;
+			case calc_and:
 			{
-				a_pbuffer[i] &= opt_val;
+				data &= opt_val;
 			}
-		}
-			break;
-		case calc_or:
-		{
-			for (u32 i = 0; i < a_size; i++)
+				break;
+			case calc_or:
 			{
-				a_pbuffer[i] |= opt_val;
+				data |= opt_val;
 			}
+				break;
+			default:
+				break;
 		}
-			break;
-		default:
-			break;
+
+		encode(opt_size, data, i, a_pbuffer);
 	}
 }
 
@@ -194,7 +259,11 @@ int main(int argc, char** argv)
 {
 	prepare_main(argc, argv);
 
-	if (false == getargs(argc, argv)) return 1;
+	if (false == getargs(argc, argv))
+	{
+		help();
+		return 1;
+	}
 	if (false == check_opt()) return 1;
 
 	run();
