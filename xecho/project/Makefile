@@ -39,7 +39,7 @@ $(TARGET): $(OBJS)
 	$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 install:
-	@cp $(TARGET) /usr/local/bin
+	cp $(TARGET) /usr/local/bin
 
 clean:
 	rm -f *.o

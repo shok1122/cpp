@@ -21,7 +21,7 @@ SRCS := $(OBJS:.o=.cpp)
 
 vpath %.cpp $(DEVROOT)/$(TARGET)/src
 
-.PHONY: release debug all clean distclean
+.PHONY: release debug all install clean distclean
 
 release: CFLAGS += $(CFLAGS_RELEASE)
 release: all
@@ -37,6 +37,9 @@ $(TARGET): $(OBJS)
 
 .cpp.o:
 	$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+install:
+	cp $(TARGET) /usr/local/bin
 
 clean:
 	rm -f *.o
