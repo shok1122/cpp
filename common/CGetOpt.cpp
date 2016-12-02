@@ -62,7 +62,13 @@ char* CGetOpt::toString(char* a_pcharBuffer, u32 a_u32Size)
 	for (u32 u32Index = 0; u32Index < m_vectorOpts.size(); u32Index++)
 	{
 		COptBase* pcOptBase = m_vectorOpts[u32Index];
-		snprintf(a_pcharBuffer, strlen(a_pcharBuffer), "%s", pcOptBase->toString(a_pcharBuffer, a_u32Size));
+
+		char pcharOptString[128];
+		memset(pcharOptString, 0, sizeof(pcharOptString));
+
+		char* pchar = &(a_pcharBuffer[strlen(a_pcharBuffer)]);
+		u32 u32Size = a_u32Size - strlen(a_pcharBuffer);
+		snprintf(pchar, u32Size, "%s", pcOptBase->toString(pcharOptString, sizeof(pcharOptString)));
 	}
 
 	return a_pcharBuffer;
