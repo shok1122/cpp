@@ -20,7 +20,7 @@ OBJS += main.o
 OBJS += CGetOpt.o
 OBJS += COptBase.o
 OBJS += COptUint32.o
-OBJS += COptBinary.o
+OBJS += COptBoolean.o
 OBJS += COptString.o
 OBJS += COptHelp.o
 SRCS := $(OBJS:.o=.cpp)

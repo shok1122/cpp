@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <CGetOpt.h>
 #include <COptUint32.h>
-#include <COptBinary.h>
+#include <COptBoolean.h>
 #include <COptString.h>
 #include <string>
 
@@ -13,11 +13,11 @@ static const char* sc_pcharUsage =
 static const char* sc_pcharHelp =
 	"show this help\n";
 
-static COptUint32 s_cOptAaa(10, "aaa", "aaa is decimal value");
-static COptUint32 s_cOptBbb(16, "bbb", "bbb is hex value");
-static COptUint32 s_cOptCcc(10, "ccc", "ccc is decimal value");
-static COptString s_cOptDdd("ddd", "ddd is string");
-static COptBinary s_cOptEee("eee", "eee is binary option");
+static COptUint32  s_cOptAaa(10, "aaa", "aaa is decimal value");
+static COptUint32  s_cOptBbb(16, "bbb", "bbb is hex value");
+static COptUint32  s_cOptCcc(10, "ccc", "ccc is decimal value");
+static COptString  s_cOptDdd("ddd", "ddd is string");
+static COptBoolean s_cOptEee("eee", "eee is boolean option");
 
 int main(int argc, char** argv)
 {
