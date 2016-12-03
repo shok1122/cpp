@@ -56,22 +56,17 @@ bool CGetOpt::decode(const char* a_name, char* a_optarg)
 	return true;
 }
 
-char* CGetOpt::toString(char* a_pcharBuffer, u32 a_u32Size)
+std::string& CGetOpt::toString(std::string& a_str)
 {
-	memset(a_pcharBuffer, 0, a_u32Size);
 	for (u32 u32Index = 0; u32Index < m_vectorOpts.size(); u32Index++)
 	{
 		COptBase* pcOptBase = m_vectorOpts[u32Index];
 
-		char pcharOptString[128];
-		memset(pcharOptString, 0, sizeof(pcharOptString));
-
-		char* pchar = &(a_pcharBuffer[strlen(a_pcharBuffer)]);
-		u32 u32Size = a_u32Size - strlen(a_pcharBuffer);
-		snprintf(pchar, u32Size, "%s", pcOptBase->toString(pcharOptString, sizeof(pcharOptString)));
+		std::string buffer;
+		a_str += pcOptBase->toString(buffer);
 	}
 
-	return a_pcharBuffer;
+	return a_str;
 }
 
 void CGetOpt::add(COptBase* a_pcOptBase)
@@ -116,9 +111,8 @@ bool CGetOpt::getopt(int a_argc, char** a_argv)
 	}
 	else
 	{
-		char pcharBuffer[256];
-		memset(pcharBuffer, 0, sizeof(pcharBuffer));
-		fprintf(stderr, "%s", toString(pcharBuffer, sizeof(pcharBuffer)));
+		std::string buffer;
+		fprintf(stderr, "%s", toString(buffer).c_str());
 	}
 
 	return true;
@@ -129,10 +123,10 @@ void CGetOpt::help() const
 	fprintf(stderr, "%s", mc_pcharOptUsage);
 	fprintf(stderr, "[OPTION]\n");
 
-	char pcharBuf[256];
 	for (u32 u32Index = 0; u32Index < m_vectorOpts.size(); u32Index++)
 	{
 		COptBase* pcOptBase = m_vectorOpts[u32Index];
-		fprintf(stderr, "%s", pcOptBase->help(pcharBuf, 256));
+		std::string buffer;
+		fprintf(stderr, "%s", pcOptBase->help(buffer).c_str());
 	}
 }

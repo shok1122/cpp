@@ -21,11 +21,13 @@ void COptBinary::decode(const char* a_optarg)
 	m_bEnable = true;
 }
 
-char* COptBinary::toString(char* a_pcharBuffer, u32 a_u32BufferSize)
+std::string& COptBinary::toString(std::string& a_str)
 {
-	u32 u32Size = a_u32BufferSize - strlen(a_pcharBuffer);
-	snprintf(a_pcharBuffer, u32Size, "--%s=%s\n",
-			mc_pcharOptName,
-			(true == m_bEnable) ? "enable" : "disable");
-	return a_pcharBuffer;
+	a_str.append("--");
+	a_str.append(mc_pcharOptName);
+	a_str.append("=");
+	a_str.append((true == m_bEnable) ? "enable" : "disable");
+	a_str.append("\n");
+
+	return a_str;
 }

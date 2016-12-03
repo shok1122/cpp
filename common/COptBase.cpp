@@ -17,7 +17,7 @@ COptBase::~COptBase()
 	// do nothing
 }
 
-char* COptBase::help(char* a_pcharBuf, u32 a_u32BufSize) const
+std::string& COptBase::help(std::string& a_str) const
 {
 	char pcharOptName[16];
 	memset(pcharOptName, ' ', sizeof(pcharOptName));
@@ -29,7 +29,11 @@ char* COptBase::help(char* a_pcharBuf, u32 a_u32BufSize) const
 	pcharOptName[strlen(pcharOptName)] = ' ';
 	pcharOptName[sizeof(pcharOptName)] = 0;
 
-	snprintf(a_pcharBuf, a_u32BufSize, "    %s %s\n", pcharOptName, mc_pcharDescription);
+	a_str.append("    ");
+	a_str.append(pcharOptName);
+	a_str.append(" ");
+	a_str.append(mc_pcharDescription);
+	a_str.append("\n");
 
-	return a_pcharBuf;
+	return a_str;
 }

@@ -14,7 +14,7 @@ public:
 
 	void add(COptBase* a_pcOptBase);
 	bool getopt(int a_argc, char** a_argv);
-	char* toString(char* a_pcharBuffer, u32 a_u32Size);
+	std::string& toString(std::string& a_str);
 	void help() const;
 
 private:

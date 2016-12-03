@@ -23,9 +23,12 @@ void COptUint32::decode(const char* a_optarg)
 	m_u32Val = (u32) strtol(a_optarg, &pcharEnd, m_u8Base);
 }
 
-char* COptUint32::toString(char* a_pcharBuffer, u32 a_u32BufferSize)
+std::string& COptUint32::toString(std::string& a_str)
 {
-	u32 u32Size = a_u32BufferSize - strlen(a_pcharBuffer);
-	snprintf(a_pcharBuffer, u32Size, "--%s=%ld\n", mc_pcharOptName, m_u32Val);
-	return a_pcharBuffer;
+	a_str.append("--");
+	a_str.append(mc_pcharOptName);
+	a_str.append("=");
+	a_str += std::to_string(m_u32Val);
+	a_str.append("\n");
+	return a_str;
 }

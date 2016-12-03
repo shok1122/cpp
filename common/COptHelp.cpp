@@ -21,8 +21,8 @@ void COptHelp::decode(const char* a_optarg)
 	m_bEnable = true;
 }
 
-char* COptHelp::toString(char* a_pcharBuffer, u32 a_u32BufferSize)
+std::string& COptHelp::toString(std::string& a_str)
 {
 	// do nothing
-	return a_pcharBuffer;
+	return a_str;
 }

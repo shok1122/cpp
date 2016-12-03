@@ -3,6 +3,7 @@
 #include <COptUint32.h>
 #include <COptBinary.h>
 #include <COptString.h>
+#include <string>
 
 #include <getopt.h>
 

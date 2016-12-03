@@ -21,9 +21,13 @@ void COptString::decode(const char* a_optarg)
 	mc_pcharVal = a_optarg;
 }
 
-char* COptString::toString(char* a_pcharBuffer, u32 a_u32BufferSize)
+std::string& COptString::toString(std::string& a_str)
 {
-	u32 u32Size = a_u32BufferSize - strlen(a_pcharBuffer);
-	snprintf(a_pcharBuffer, u32Size, "--%s=%s\n", mc_pcharOptName, mc_pcharVal);
-	return a_pcharBuffer;
+	a_str.append("--");
+	a_str.append(mc_pcharOptName);
+	a_str.append("=");
+	a_str.append((nullptr == mc_pcharVal) ? "(null)" : mc_pcharVal);
+	a_str.append("\n");
+
+	return a_str;
 }
